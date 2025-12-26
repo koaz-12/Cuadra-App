@@ -12,7 +12,12 @@ interface Props {
 }
 
 export const CreditCard = memo(({ card, secondaryCard, onDelete, onQuickAction }: Props) => {
-    const paymentDate = useMemo(() => getNextPaymentDate(card.paymentDueDay), [card.paymentDueDay]);
+    const paymentDate = useMemo(() => {
+        if (card.paymentWindowDays && card.paymentWindowDays > 0) {
+            return getNextPaymentDate(card.cutoffDay, card.paymentWindowDays);
+        }
+        return getNextPaymentDate(card.paymentDueDay);
+    }, [card.cutoffDay, card.paymentDueDay, card.paymentWindowDays]);
     const isNearDue = useMemo(() => {
         const diff = paymentDate.getTime() - new Date().getTime();
         const days = Math.ceil(diff / (1000 * 3600 * 24));
