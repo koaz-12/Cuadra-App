@@ -42,7 +42,7 @@ export const ExpenseForm = ({ initialData }: Props) => {
                 await addExpense(expenseData);
             }
 
-            router.push('/');
+            router.push('/expenses');
             router.refresh();
         } catch (error) {
             console.error(error);

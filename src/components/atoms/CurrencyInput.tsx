@@ -40,24 +40,22 @@ export const CurrencyInput = ({ value, onChange, placeholder, className, name, c
         // 1. Get raw input
         let val = e.target.value;
 
-        // 2. Remove non-numeric chars (allow one dot)
-        // Keep only numbers and dot
+        // 2. Remove non-numeric chars (allow dot)
         const rawValue = val.replace(/,/g, '');
 
         // Validation: is it a valid number?
         if (rawValue === '' || /^\d*\.?\d*$/.test(rawValue)) {
-            // Update parent with RAW value (so it can store number/string)
+            // 3. Update Parent with RAW value
             onChange(rawValue);
 
-            // Note: The useEffect will re-format the display value. 
-            // However, this might cause cursor jumps if we format "1000" to "1,000" immediately.
-            // To prevent cursor jumping, standard practice is to handle formatting on Blur, 
-            // OR use a specialized library. 
-            // Given "when I add digits, it puts commas automatically" is the request...
-            // I will try to format locally but maintaining cursor is hard without a lib.
-            // Let's try simple formatting. Since we update parent, parent updates prop 'value', useEffect updates 'displayValue'.
-            // This loop usually causes cursor jump to end.
-            // For now, let's implement the simpler "Format as you type" locally.
+            // 4. Update Local Display with Commas
+            if (rawValue === '') {
+                setDisplayValue('');
+            } else {
+                const parts = rawValue.split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                setDisplayValue(parts.join('.'));
+            }
         }
     };
 
