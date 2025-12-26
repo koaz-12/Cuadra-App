@@ -121,7 +121,8 @@ export const CardForm = ({ initialData, secondaryData }: Props) => {
             router.refresh(); // Refresh data
             router.push('/products'); // Go to Wallet/Cartera page
         } catch (error) {
-            console.error(error);
+            console.error('CardForm Submit Error:', error);
+            // alert('Ocurrió un error al guardar la tarjeta. Revisa la consola para más detalles.');
         } finally {
             setLoading(false);
         }
@@ -340,7 +341,6 @@ export const CardForm = ({ initialData, secondaryData }: Props) => {
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">USD$</span>
                                     <CurrencyInput
-                                        required
                                         name="secStatementBalance"
                                         value={formData.secStatementBalance}
                                         onChange={(val) => setFormData(prev => ({ ...prev, secStatementBalance: val }))}
