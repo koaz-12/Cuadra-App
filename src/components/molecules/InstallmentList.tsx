@@ -6,9 +6,10 @@ interface Props {
     installments?: Installment[];
     currency: Currency;
     onDelete?: (id: string) => void;
+    onEdit?: (inst: Installment) => void;
 }
 
-export const InstallmentList = ({ installments, currency, onDelete }: Props) => {
+export const InstallmentList = ({ installments, currency, onDelete, onEdit }: Props) => {
     if (!installments || installments.length === 0) {
         return null;
     }
@@ -24,7 +25,7 @@ export const InstallmentList = ({ installments, currency, onDelete }: Props) => 
                     const progress = (inst.currentInstallment / inst.totalInstallments) * 100;
                     return (
                         <div key={inst.id} className="p-4 hover:bg-slate-50 transition-colors group relative">
-                            <div className="flex justify-between items-start mb-2">
+                            <div className="flex justify-between items-start mb-2 pr-16">
                                 <div>
                                     <p className="font-bold text-slate-800 text-sm">{inst.description}</p>
                                     <p className="text-xs text-slate-400">
@@ -47,21 +48,35 @@ export const InstallmentList = ({ installments, currency, onDelete }: Props) => 
                                 ></div>
                             </div>
 
-                            {onDelete && (
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); onDelete(inst.id); }}
-                                    className="absolute top-2 right-2 p-1 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                    title="Eliminar Cuota"
-                                >
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            )}
+                            <div className="absolute top-2 right-2 flex gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                {onEdit && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onEdit(inst); }}
+                                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Editar Cuota"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
+                                    </button>
+                                )}
+                                {onDelete && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onDelete(inst.id); }}
+                                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                        title="Eliminar Cuota"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     );
                 })}
             </div>
+
             <div className="p-3 bg-slate-50 text-center border-t border-slate-100">
                 <p className="text-xs text-slate-500">
                     Total Mensual en Cuotas: <span className="font-bold text-slate-700">
