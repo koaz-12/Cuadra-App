@@ -13,12 +13,15 @@ export const ExpenseInsightsWidget = ({ expenses }: Props) => {
     const stats = useMemo(() => {
         if (expenses.length === 0) return null;
 
-        const totalMonthly = expenses.reduce((sum, e) => sum + e.amount, 0); // Assuming dominant currency or simple sum
-        const highest = [...expenses].sort((a, b) => b.amount - a.amount)[0];
-        const annualProjection = totalMonthly * 12;
+        const totalDOP = expenses.filter(e => e.currency === 'DOP').reduce((sum, e) => sum + e.amount, 0);
+        const totalUSD = expenses.filter(e => e.currency === 'USD').reduce((sum, e) => sum + e.amount, 0);
 
-        return { totalMonthly, highest, annualProjection };
+        const highest = [...expenses].sort((a, b) => b.amount - a.amount)[0];
+
+        return { totalDOP, totalUSD, highest };
     }, [expenses]);
+
+    // ... (rest of hook) ...
 
     // 2. Prepare Chart Data (Aggregated History)
     const chartData = useMemo(() => {
@@ -49,6 +52,17 @@ export const ExpenseInsightsWidget = ({ expenses }: Props) => {
             .slice(-6); // Last 6 months
     }, [expenses]);
 
+    // Helper to render dual currency
+    const renderDualAmount = (dop: number, usd: number, label?: string) => {
+        if (dop === 0 && usd === 0) return <p className="text-xl font-black text-slate-900">$0.00</p>;
+        return (
+            <div className="flex flex-col">
+                {dop > 0 && <p className="text-lg font-black text-slate-900">{formatCurrency(dop, 'DOP')}</p>}
+                {usd > 0 && <p className="text-sm font-bold text-slate-500">{formatCurrency(usd, 'USD')}</p>}
+            </div>
+        );
+    };
+
     if (!stats) return null;
 
     return (
@@ -67,7 +81,7 @@ export const ExpenseInsightsWidget = ({ expenses }: Props) => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
                     <p className="text-xs text-slate-500 font-bold uppercase mb-1">Costo Anual (Est.)</p>
-                    <p className="text-xl font-black text-slate-900">{formatCurrency(stats.annualProjection, 'DOP')}</p>
+                    {renderDualAmount(stats.totalDOP * 12, stats.totalUSD * 12)}
                 </div>
                 <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
                     <p className="text-xs text-slate-500 font-bold uppercase mb-1">Gasto Más Alto</p>
@@ -76,7 +90,7 @@ export const ExpenseInsightsWidget = ({ expenses }: Props) => {
                 </div>
                 <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
                     <p className="text-xs text-slate-500 font-bold uppercase mb-1">Promedio Mensual</p>
-                    <p className="text-xl font-black text-slate-900">{formatCurrency(stats.totalMonthly, 'DOP')}</p>
+                    {renderDualAmount(stats.totalDOP, stats.totalUSD)}
                 </div>
             </div>
 
