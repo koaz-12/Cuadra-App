@@ -260,7 +260,11 @@ export default function CardDetailPage({ params }: Props) {
                 </div>
 
                 {/* Timeline */}
-                <CycleTimeline cutoffDay={card.cutoffDay} paymentDueDay={card.paymentDueDay} />
+                <CycleTimeline
+                    cutoffDay={card.cutoffDay}
+                    paymentDueDay={card.paymentDueDay}
+                    paymentWindowDays={card.paymentWindowDays}
+                />
 
                 {/* Actions Grid */}
                 <div className="grid grid-cols-2 gap-4">

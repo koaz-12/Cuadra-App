@@ -4,47 +4,52 @@ import { formatDate } from '@/utils/format';
 interface Props {
     cutoffDay: number;
     paymentDueDay: number;
+    paymentWindowDays?: number;
 }
 
-export const CycleTimeline = ({ cutoffDay, paymentDueDay }: Props) => {
+export const CycleTimeline = ({ cutoffDay, paymentDueDay, paymentWindowDays }: Props) => {
     const today = new Date();
     const currentDay = today.getDate();
 
-    // Logic to determine dates based on simple day numbers (1-31)
-    // This is a simplification. Real logic handles month traversal.
-
-    // Calculate "Previous Cutoff"
+    // 1. Calculate Active Cycle (Previous Cutoff -> Next Cutoff)
     const prevCutoff = new Date();
+    // If we haven't reached cutoff yet, the "previous" cutoff was last month
     if (currentDay < cutoffDay) {
         prevCutoff.setMonth(prevCutoff.getMonth() - 1);
     }
     prevCutoff.setDate(cutoffDay);
+    // Reset time to avoid drift
+    prevCutoff.setHours(0, 0, 0, 0);
 
-    // Calculate "Next Cutoff"
     const nextCutoff = new Date(prevCutoff);
     nextCutoff.setMonth(nextCutoff.getMonth() + 1);
 
-    // Calculate "Payment Due" (Usually after the *next* cutoff, or after the *previous* cutoff depending on logic)
-    // Standard logic: Statements cuts on X. Payment is Y days after X.
-    // We have `paymentDueDay`. We assume it's in the month FOLLOWING the cutoff.
-    const paymentDate = new Date(nextCutoff);
-    // If payment day is smaller than cutoff, it's definitely next month.
-    // If payment day is larger, it might be same month? Typically payment is ~20 days after cutoff.
-    // Let's assume paymentDueDay is the day of the month.
-    paymentDate.setDate(paymentDueDay);
-    if (paymentDueDay < cutoffDay) {
-        // It wraps to next month relative to cutoff
-        // Already set to next month above (nextCutoff)
+    // 2. Calculate Payment Deadline
+    let deadline = new Date(prevCutoff);
+
+    if (paymentWindowDays && paymentWindowDays > 0) {
+        // Dynamic: Cutoff + Days
+        deadline.setDate(deadline.getDate() + paymentWindowDays);
     } else {
-        // Same month as cutoff? Unlikely for "Due Date", usually next month.
-        // Let's stick to standard credit card logic: Cutoff Jan 15 -> Due Feb 5.
+        // Fixed Day Logic
+        // We want the 'paymentDueDay' that corresponds to this cycle (PrevCutoff).
+        // Typically Due Date is between PrevCutoff and NextCutoff.
+
+        // Start with Next Cutoff month/year
+        deadline = new Date(nextCutoff);
+
+        if (paymentDueDay >= cutoffDay) {
+            // Example: Cutoff 5, Due 25. Cycle Dec 5 -> Jan 5.
+            // Due date should be Dec 25 (Same month as PrevCutoff).
+            deadline.setMonth(deadline.getMonth() - 1);
+        }
+        // Example: Cutoff 20, Due 5. Cycle Dec 20 -> Jan 20.
+        // Due date should be Jan 5 (Same month as NextCutoff).
+
+        deadline.setDate(paymentDueDay);
     }
 
-    // To draw the line, we need % progress
-    // Start: Previous Cutoff
-    // End: Next Cutoff (The cycle) -- OR -- Payment Date?
-    // Let's visualize the "Active Cycle" (Cutoff to Cutoff) + Payment deadline
-
+    // 3. Progress Calculation
     const totalDays = (nextCutoff.getTime() - prevCutoff.getTime()) / (1000 * 3600 * 24);
     const daysPassed = (today.getTime() - prevCutoff.getTime()) / (1000 * 3600 * 24);
     const progress = Math.min(100, Math.max(0, (daysPassed / totalDays) * 100));
@@ -93,9 +98,13 @@ export const CycleTimeline = ({ cutoffDay, paymentDueDay }: Props) => {
             <div className="mt-8 p-3 bg-indigo-50 rounded-lg flex items-center justify-between border border-indigo-100">
                 <div>
                     <p className="text-xs text-indigo-500 font-bold uppercase">Fecha Límite de Pago</p>
-                    <p className="text-sm font-semibold text-indigo-800">Pagar antes del próximo corte</p>
+                    <p className="text-sm font-semibold text-indigo-800">
+                        {paymentWindowDays
+                            ? `${paymentWindowDays} días tras el corte`
+                            : 'Día fijo de pago'}
+                    </p>
                 </div>
-                <p className="text-xl font-black text-indigo-700">{paymentDueDay}</p>
+                <p className="text-xl font-black text-indigo-700">{formatDate(deadline)}</p>
             </div>
         </div>
     );
