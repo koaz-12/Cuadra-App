@@ -9,9 +9,10 @@ interface CurrencyInputProps {
     currency?: 'DOP' | 'USD';
     required?: boolean;
     autoFocus?: boolean;
+    onBlur?: () => void;
 }
 
-export const CurrencyInput = ({ value, onChange, placeholder, className, name, currency = 'DOP', required, autoFocus }: CurrencyInputProps) => {
+export const CurrencyInput = ({ value, onChange, placeholder, className, name, currency = 'DOP', required, autoFocus, onBlur }: CurrencyInputProps) => {
     // Internal state for display
     const [displayValue, setDisplayValue] = useState('');
 
@@ -76,6 +77,7 @@ export const CurrencyInput = ({ value, onChange, placeholder, className, name, c
             className={className}
             required={required}
             autoFocus={autoFocus}
+            onBlur={onBlur}
         />
     );
 };
