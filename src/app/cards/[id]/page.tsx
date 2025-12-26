@@ -434,23 +434,40 @@ export default function CardDetailPage({ params }: Props) {
                                 ) : (
                                     <form onSubmit={actionModal === 'statement' ? handleStatementSubmit : handlePaymentSubmit} className="p-6 space-y-4">
                                         {actionModal === 'payment' && (
-                                            <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+                                            <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide">
                                                 <button
                                                     type="button"
                                                     onClick={() => setAmountInput(card.statementBalance.toString())}
                                                     className="px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors whitespace-nowrap"
                                                 >
-                                                    Total al Corte: {formatCurrency(card.statementBalance, card.currency)}
+                                                    Al Corte: {formatCurrency(card.statementBalance, card.currency)}
                                                 </button>
-                                                {card.minimumPayment > 0 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setAmountInput(card.minimumPayment.toString())}
-                                                        className="px-3 py-1.5 bg-slate-50 text-slate-600 text-xs font-bold rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors whitespace-nowrap"
-                                                    >
-                                                        Mínimo: {formatCurrency(card.minimumPayment, card.currency)}
-                                                    </button>
-                                                )}
+
+                                                {/* Corte + Cuotas Logic */}
+                                                {(() => {
+                                                    const monthlyInstallments = card.installments?.reduce((sum, i) => sum + i.monthlyAmount, 0) || 0;
+                                                    if (monthlyInstallments > 0) {
+                                                        const cortePlus = card.statementBalance + monthlyInstallments;
+                                                        return (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setAmountInput(cortePlus.toString())}
+                                                                className="px-3 py-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-100 hover:bg-indigo-100 transition-colors whitespace-nowrap"
+                                                            >
+                                                                Corte+Cuotas: {formatCurrency(cortePlus, card.currency)}
+                                                            </button>
+                                                        );
+                                                    }
+                                                    return null;
+                                                })()}
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setAmountInput(card.currentBalance.toString())}
+                                                    className="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 hover:bg-slate-200 transition-colors whitespace-nowrap"
+                                                >
+                                                    Total: {formatCurrency(card.currentBalance, card.currency)}
+                                                </button>
                                             </div>
                                         )}
 

@@ -106,14 +106,24 @@ export const QuickPayModal = ({ quickPay, onClose, onConfirm }: Props) => {
                                 </label>
 
                                 {quickPay.type === 'card' && paymentCurrency === quickPay.item.currency && (
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => setAmount(String(quickPay.item.statementBalance))}
-                                            className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-2 rounded-lg transition-colors cursor-pointer border border-blue-100 h-full flex items-center justify-center text-center"
-                                        >
-                                            Corte: {formatCurrency(quickPay.item.statementBalance, quickPay.item.currency)}
-                                        </button>
+                                    <div className="flex flex-col gap-2">
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setAmount(String(quickPay.item.statementBalance))}
+                                                className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-3 rounded-lg transition-colors cursor-pointer border border-blue-100 flex items-center justify-center text-center"
+                                            >
+                                                Corte: {formatCurrency(quickPay.item.statementBalance, quickPay.item.currency)}
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() => setAmount(String(quickPay.item.currentBalance))}
+                                                className="text-xs font-bold text-slate-600 hover:text-slate-700 bg-slate-100 px-3 py-3 rounded-lg transition-colors cursor-pointer border border-slate-200 flex items-center justify-center text-center"
+                                            >
+                                                Total: {formatCurrency(quickPay.item.currentBalance, quickPay.item.currency)}
+                                            </button>
+                                        </div>
 
                                         {(() => {
                                             const installments = Array.isArray(quickPay.item.installments) ? quickPay.item.installments : [];
@@ -126,23 +136,14 @@ export const QuickPayModal = ({ quickPay, onClose, onConfirm }: Props) => {
                                                     <button
                                                         type="button"
                                                         onClick={() => setAmount(String(cortePlusCuota))}
-                                                        className="text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-2 rounded-lg transition-colors cursor-pointer border border-indigo-100 h-full flex items-center justify-center text-center"
+                                                        className="w-full text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-3 rounded-lg transition-colors cursor-pointer border border-indigo-100 flex items-center justify-center text-center"
                                                         title="Corte + Cuotas del mes"
                                                     >
                                                         Corte + Cuotas: {formatCurrency(cortePlusCuota, quickPay.item.currency)}
                                                     </button>
                                                 );
-                                            } else {
-                                                return (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setAmount(String(quickPay.item.currentBalance))}
-                                                        className="text-xs font-bold text-slate-600 hover:text-slate-700 bg-slate-100 px-3 py-2 rounded-lg transition-colors cursor-pointer border border-slate-200 h-full flex items-center justify-center text-center"
-                                                    >
-                                                        Total: {formatCurrency(quickPay.item.currentBalance, quickPay.item.currency)}
-                                                    </button>
-                                                );
                                             }
+                                            return null;
                                         })()}
                                     </div>
                                 )}
