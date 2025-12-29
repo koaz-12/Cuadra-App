@@ -96,11 +96,12 @@ export default function ExpensesPage() {
 
                     {/* --- Fixed Expenses Section --- */}
                     <section className="space-y-6">
-                        <div className="flex justify-between items-end">
+                        <div className="flex justify-between items-center">
                             <h2 className="text-xl font-bold text-slate-900">Gastos Recurrentes (Fijos)</h2>
                             <Link href="/expenses/new">
-                                <button className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg border border-emerald-100 transition-colors">
-                                    <Plus size={14} /> Nuevo
+                                <button className="bg-emerald-600 text-white hover:bg-emerald-700 transition-colors px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-emerald-200 active:scale-95">
+                                    <Plus size={18} />
+                                    Agregar Fijo
                                 </button>
                             </Link>
                         </div>
