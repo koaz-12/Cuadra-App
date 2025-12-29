@@ -28,11 +28,11 @@ export const AddExpenseModal = ({ isOpen, onClose, categories, initialCategoryId
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!amount || !categoryId) return;
+        if (!amount) return; // Category is now optional
 
         setLoading(true);
         const success = await onAddExpense({
-            categoryId,
+            categoryId: categoryId || null, // Send null if empty
             amount: Number(amount),
             date: new Date(),
             description: description || 'Gasto rápido'
@@ -70,13 +70,21 @@ export const AddExpenseModal = ({ isOpen, onClose, categories, initialCategoryId
 
                     {/* Category Selector */}
                     <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">Categoría</label>
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Categoría (Opcional)</label>
+                            {categoryId && (
+                                <button type="button" onClick={() => setCategoryId('')} className="text-xs text-rose-500 hover:underline">
+                                    Quitar selección
+                                </button>
+                            )}
+                        </div>
+
                         <div className="grid grid-cols-2 gap-2 max-h-[160px] overflow-y-auto pr-1">
                             {categories.map(cat => (
                                 <button
                                     key={cat.id}
                                     type="button"
-                                    onClick={() => setCategoryId(cat.id)}
+                                    onClick={() => setCategoryId(cat.id === categoryId ? '' : cat.id)}
                                     className={`p-2 rounded-xl border flex items-center gap-2 transition-all text-sm font-bold text-left
                                         ${categoryId === cat.id
                                             ? 'bg-slate-900 text-white border-slate-900 shadow-md ring-2 ring-emerald-400 ring-offset-2'
@@ -89,9 +97,14 @@ export const AddExpenseModal = ({ isOpen, onClose, categories, initialCategoryId
                             ))}
                         </div>
                         {categories.length === 0 && (
-                            <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg border border-amber-100">
-                                Primero debes crear categorías en la pestaña "Presupuesto".
+                            <p className="text-sm text-slate-400 bg-slate-50 p-3 rounded-lg border border-slate-100 italic">
+                                Aún no tienes categorías. Se guardará como "Sin Categoría".
                             </p>
+                        )}
+                        {categoryId === '' && categories.length > 0 && (
+                            <div className="mt-2 text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
+                                💡 Guardando sin categoría.
+                            </div>
                         )}
                     </div>
 
@@ -108,7 +121,7 @@ export const AddExpenseModal = ({ isOpen, onClose, categories, initialCategoryId
                     </div>
 
                     <button
-                        disabled={loading || !amount || !categoryId}
+                        disabled={loading || !amount}
                         className="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 active:scale-95 shadow-lg shadow-emerald-200 transition-all disabled:opacity-50 disabled:shadow-none disabled:active:scale-100 flex items-center justify-center gap-2"
                     >
                         {loading && <Loader2 className="animate-spin" size={20} />}

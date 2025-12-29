@@ -23,11 +23,13 @@ export const VariableExpensesList = ({ expenses, categories }: Props) => {
 
     const sortedDates = Object.keys(grouped).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
-    const getCategoryName = (id: string) => {
+    const getCategoryName = (id?: string | null) => {
+        if (!id) return 'Sin Categoría';
         return categories.find(c => c.id === id)?.name || 'Sin Categoría';
     };
 
-    const getCategoryIcon = (id: string) => {
+    const getCategoryIcon = (id?: string | null) => {
+        if (!id) return '📝';
         return categories.find(c => c.id === id)?.icon || '🏷️';
     };
 
@@ -38,7 +40,7 @@ export const VariableExpensesList = ({ expenses, categories }: Props) => {
                     <TrendingDown size={32} />
                 </div>
                 <p className="text-slate-400 font-medium">No hay gastos variables recientes.</p>
-                <p className="text-xs text-slate-300 mt-1">Regístralos desde la sección de Presupuesto.</p>
+                <p className="text-xs text-slate-300 mt-1">Regístralos para llevar control diario.</p>
             </div>
         );
     }
@@ -55,7 +57,7 @@ export const VariableExpensesList = ({ expenses, categories }: Props) => {
                         {grouped[date].map(expense => (
                             <div key={expense.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl shrink-0">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 ${!expense.categoryId ? 'bg-slate-100 text-slate-500' : 'bg-indigo-50 text-indigo-600'}`}>
                                         {getCategoryIcon(expense.categoryId)}
                                     </div>
                                     <div>

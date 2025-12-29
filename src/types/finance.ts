@@ -53,7 +53,7 @@ export interface BudgetCategory {
 export interface VariableExpense {
   id: string;
   userId: string;
-  categoryId: string;
+  categoryId?: string | null;
   amount: number;
   date: string | Date;
   description?: string;
