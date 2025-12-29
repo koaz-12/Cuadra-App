@@ -7,15 +7,13 @@ import { useBudgets } from '@/hooks/useBudgets';
 import { FixedExpenseRow } from '@/components/molecules/FixedExpenseRow';
 import { BudgetWidget } from '@/components/organisms/BudgetWidget';
 import { VariableExpensesList } from '@/components/organisms/VariableExpensesList';
-import { AddExpenseModal } from '@/components/organisms/modals/AddExpenseModal';
-import { AddFixedExpenseModal } from '@/components/organisms/modals/AddFixedExpenseModal';
+import { UnifiedExpenseModal } from '@/components/organisms/modals/UnifiedExpenseModal';
 import { Plus, TrendingUp, CheckCircle2, Clock, CalendarRange, ArrowRight, List, LayoutGrid, Banknote } from 'lucide-react';
 import { formatCurrency } from '@/utils/format';
 
 export default function ExpensesPage() {
     const [activeTab, setActiveTab] = useState<'movements' | 'budget'>('movements');
-    const [isAddingExpense, setIsAddingExpense] = useState(false);
-    const [isAddingFixed, setIsAddingFixed] = useState(false);
+    const [isUnifiedModalOpen, setIsUnifiedModalOpen] = useState(false);
 
     // Fixed Expenses Logic
     const { expenses, loading: expensesLoading, togglePaid, removeExpense } = useFixedExpenses();
@@ -74,24 +72,34 @@ export default function ExpensesPage() {
                     </div>
                 </div>
 
-                {/* Tabs */}
-                <div className="bg-slate-100 p-1 rounded-xl flex gap-1">
+                <div className="flex items-center gap-2">
                     <button
-                        onClick={() => setActiveTab('movements')}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'movements' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        onClick={() => setIsUnifiedModalOpen(true)}
+                        className="bg-slate-900 text-white hover:bg-slate-800 transition-colors px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-slate-200 active:scale-95"
                     >
-                        <List size={18} />
-                        Movimientos
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('budget')}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'budget' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                    >
-                        <LayoutGrid size={18} />
-                        Presupuesto
+                        <Plus size={20} />
+                        Nuevo Gasto
                     </button>
                 </div>
             </header>
+
+            {/* Tabs */}
+            <div className="bg-slate-100 p-1 rounded-xl flex gap-1 w-fit">
+                <button
+                    onClick={() => setActiveTab('movements')}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'movements' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                    <List size={18} />
+                    Movimientos
+                </button>
+                <button
+                    onClick={() => setActiveTab('budget')}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'budget' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                    <LayoutGrid size={18} />
+                    Presupuesto
+                </button>
+            </div>
 
             {activeTab === 'movements' ? (
                 <div className="space-y-10 animate-in fade-in slide-in-from-left-4 duration-300">
@@ -100,16 +108,9 @@ export default function ExpensesPage() {
                     <section className="space-y-6">
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-bold text-slate-900">Gastos Recurrentes (Fijos)</h2>
-                            <button
-                                onClick={() => setIsAddingFixed(true)}
-                                className="bg-emerald-600 text-white hover:bg-emerald-700 transition-colors px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-emerald-200 active:scale-95"
-                            >
-                                <Plus size={18} />
-                                Agregar Fijo
-                            </button>
                         </div>
 
-                        {/* Summary Cards (Only for Fixed) */}
+                        {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 relative overflow-hidden">
                                 <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
@@ -167,13 +168,6 @@ export default function ExpensesPage() {
                                 <h2 className="text-xl font-bold text-slate-900">Historial de Gastos Variables</h2>
                                 <p className="text-sm text-slate-500">Tus consumos diarios registrados en presupuesto.</p>
                             </div>
-                            <button
-                                onClick={() => setIsAddingExpense(true)}
-                                className="bg-slate-900 text-white hover:bg-slate-800 transition-colors px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-slate-200 active:scale-95"
-                            >
-                                <Banknote size={18} />
-                                Registrar Gasto
-                            </button>
                         </div>
 
                         {budgetLoading ? (
@@ -193,15 +187,10 @@ export default function ExpensesPage() {
                 </div>
             )}
 
-            <AddExpenseModal
-                isOpen={isAddingExpense}
-                onClose={() => setIsAddingExpense(false)}
+            <UnifiedExpenseModal
+                isOpen={isUnifiedModalOpen}
+                onClose={() => setIsUnifiedModalOpen(false)}
                 categories={categories}
-                onAddExpense={addExpense}
-            />
-            <AddFixedExpenseModal
-                isOpen={isAddingFixed}
-                onClose={() => setIsAddingFixed(false)}
                 onSuccess={() => window.location.reload()}
             />
         </div>
