@@ -106,7 +106,7 @@ export const CreditCard = memo(({ card, secondaryCard, onDelete, onQuickAction }
                             <div className="pt-3 border-t border-dashed border-slate-200 mt-3">
                                 <div className="flex justify-between items-center mb-1">
                                     {card.isSharedLimit ? (
-                                        <p className="text-[10px] text-slate-400 font-medium">Límite: <span className="text-slate-400 font-bold italic">Compartido</span></p>
+                                        <p className="text-[10px] text-slate-400 font-medium">Límite: <span className="text-slate-500 font-bold">Est. {formatCurrency(card.creditLimit / 62, 'USD')}</span></p>
                                     ) : (
                                         <p className="text-[10px] text-slate-400 font-medium">Límite: <span className="text-slate-600 font-bold">{formatCurrency(secondaryCard.creditLimit, secondaryCard.currency)}</span></p>
                                     )}
