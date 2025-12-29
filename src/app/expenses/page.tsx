@@ -8,12 +8,14 @@ import { FixedExpenseRow } from '@/components/molecules/FixedExpenseRow';
 import { BudgetWidget } from '@/components/organisms/BudgetWidget';
 import { VariableExpensesList } from '@/components/organisms/VariableExpensesList';
 import { AddExpenseModal } from '@/components/organisms/modals/AddExpenseModal';
+import { AddFixedExpenseModal } from '@/components/organisms/modals/AddFixedExpenseModal';
 import { Plus, TrendingUp, CheckCircle2, Clock, CalendarRange, ArrowRight, List, LayoutGrid, Banknote } from 'lucide-react';
 import { formatCurrency } from '@/utils/format';
 
 export default function ExpensesPage() {
     const [activeTab, setActiveTab] = useState<'movements' | 'budget'>('movements');
     const [isAddingExpense, setIsAddingExpense] = useState(false);
+    const [isAddingFixed, setIsAddingFixed] = useState(false);
 
     // Fixed Expenses Logic
     const { expenses, loading: expensesLoading, togglePaid, removeExpense } = useFixedExpenses();
@@ -98,12 +100,13 @@ export default function ExpensesPage() {
                     <section className="space-y-6">
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-bold text-slate-900">Gastos Recurrentes (Fijos)</h2>
-                            <Link href="/expenses/new">
-                                <button className="bg-emerald-600 text-white hover:bg-emerald-700 transition-colors px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-emerald-200 active:scale-95">
-                                    <Plus size={18} />
-                                    Agregar Fijo
-                                </button>
-                            </Link>
+                            <button
+                                onClick={() => setIsAddingFixed(true)}
+                                className="bg-emerald-600 text-white hover:bg-emerald-700 transition-colors px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-emerald-200 active:scale-95"
+                            >
+                                <Plus size={18} />
+                                Agregar Fijo
+                            </button>
                         </div>
 
                         {/* Summary Cards (Only for Fixed) */}
@@ -195,6 +198,11 @@ export default function ExpensesPage() {
                 onClose={() => setIsAddingExpense(false)}
                 categories={categories}
                 onAddExpense={addExpense}
+            />
+            <AddFixedExpenseModal
+                isOpen={isAddingFixed}
+                onClose={() => setIsAddingFixed(false)}
+                onSuccess={() => window.location.reload()}
             />
         </div>
     );
