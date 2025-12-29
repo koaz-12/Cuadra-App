@@ -63,7 +63,28 @@ export const CreditCard = memo(({ card, secondaryCard, onDelete, onQuickAction }
                         <div>
                             <div className="flex justify-between items-center mb-1">
                                 <p className="text-[10px] text-slate-400 font-medium">Límite: <span className="text-slate-600 font-bold">{formatCurrency(card.creditLimit, card.currency)}</span></p>
+                                {card.isSharedLimit && (
+                                    <span className="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded font-bold">Límite Compartido</span>
+                                )}
                             </div>
+
+                            {/* Progress Bar for Shared Limit */}
+                            {card.isSharedLimit && secondaryCard ? (() => {
+                                const rate = 62; // Est. Rate
+                                const dopUsed = card.statementBalance;
+                                const usdUsedInDop = secondaryCard.statementBalance * rate;
+                                const totalLimit = card.creditLimit;
+                                const dopPercent = Math.min((dopUsed / totalLimit) * 100, 100);
+                                const usdPercent = Math.min((usdUsedInDop / totalLimit) * 100, 100 - dopPercent);
+
+                                return (
+                                    <div className="w-full h-2 bg-slate-100 rounded-full mb-3 flex overflow-hidden">
+                                        <div style={{ width: `${dopPercent}%` }} className="bg-blue-500 h-full" />
+                                        <div style={{ width: `${usdPercent}%` }} className="bg-green-500 h-full" />
+                                    </div>
+                                );
+                            })() : null}
+
                             <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Saldo al Corte</p>
                             <div className="flex justify-between items-center">
                                 <span className="text-2xl font-bold text-slate-900 tracking-tight">
@@ -84,7 +105,11 @@ export const CreditCard = memo(({ card, secondaryCard, onDelete, onQuickAction }
                         {secondaryCard && (
                             <div className="pt-3 border-t border-dashed border-slate-200 mt-3">
                                 <div className="flex justify-between items-center mb-1">
-                                    <p className="text-[10px] text-slate-400 font-medium">Límite: <span className="text-slate-600 font-bold">{formatCurrency(secondaryCard.creditLimit, secondaryCard.currency)}</span></p>
+                                    {card.isSharedLimit ? (
+                                        <p className="text-[10px] text-slate-400 font-medium">Límite: <span className="text-slate-400 font-bold italic">Compartido</span></p>
+                                    ) : (
+                                        <p className="text-[10px] text-slate-400 font-medium">Límite: <span className="text-slate-600 font-bold">{formatCurrency(secondaryCard.creditLimit, secondaryCard.currency)}</span></p>
+                                    )}
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-2xl font-bold text-slate-800 tracking-tight">

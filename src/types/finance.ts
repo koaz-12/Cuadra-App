@@ -34,6 +34,7 @@ export interface CreditCard {
   statementBalance: number; // Deuda al corte
   minimumPayment: number;
   status: 'Active' | 'Locked';
+  isSharedLimit?: boolean; // New field for Shared Limit logic
   history?: Transaction[];
   installments?: Installment[];
 }

@@ -28,6 +28,7 @@ export const CardForm = ({ initialData, secondaryData }: Props) => {
         minimumPayment: initialData?.minimumPayment || '',
         paymentWindowDays: initialData?.paymentWindowDays || (initialData ? '' : '22'),
         paymentMode: (initialData?.paymentWindowDays || !initialData) ? 'relative' : 'fixed',
+        isSharedLimit: initialData?.isSharedLimit || false,
         // Dual Currency Fields
         isDualCurrency: !!secondaryData, // Auto-enable if secondary exists
         secCreditLimit: secondaryData?.creditLimit || '',
@@ -79,7 +80,8 @@ export const CardForm = ({ initialData, secondaryData }: Props) => {
                 currentBalance: Number(formData.currentBalance || 0),
                 statementBalance: Number(formData.statementBalance || 0),
                 minimumPayment: Number(formData.minimumPayment || 0),
-                status: initialData?.status || 'Active' as const
+                status: initialData?.status || 'Active' as const,
+                isSharedLimit: formData.isSharedLimit
             };
 
             let primaryCardId = initialData?.id;
@@ -301,25 +303,40 @@ export const CardForm = ({ initialData, secondaryData }: Props) => {
                 {/* Secondary Currency Section */}
                 {formData.isDualCurrency && (
                     <div className="pt-4 border-t border-slate-200 space-y-4 animate-in fade-in slide-in-from-top-4">
+                        <div className="flex justify-between items-center bg-green-50 p-3 rounded-lg border border-green-100">
+                            <label className="text-sm font-bold text-slate-800 flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    name="isSharedLimit"
+                                    checked={formData.isSharedLimit}
+                                    onChange={handleChange}
+                                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                                />
+                                Comparte el límite con pesos (DOP)
+                            </label>
+                        </div>
+
                         <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-green-500"></span>
                             Detalles en Dólares (USD)
                         </h4>
 
-                        <div>
-                            <label className="block text-sm font-bold text-black mb-1">Límite de Crédito (USD)</label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">USD$</span>
-                                <input
-                                    type="number"
-                                    name="secCreditLimit"
-                                    value={formData.secCreditLimit}
-                                    onChange={handleChange}
-                                    placeholder="0.00"
-                                    className="w-full rounded-lg border-slate-400 border p-2 pl-12 text-sm font-mono text-black font-semibold focus:ring-2 focus:ring-green-500 outline-none"
-                                />
+                        {!formData.isSharedLimit && (
+                            <div>
+                                <label className="block text-sm font-bold text-black mb-1">Límite de Crédito (USD)</label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">USD$</span>
+                                    <input
+                                        type="number"
+                                        name="secCreditLimit"
+                                        value={formData.secCreditLimit}
+                                        onChange={handleChange}
+                                        placeholder="0.00"
+                                        className="w-full rounded-lg border-slate-400 border p-2 pl-12 text-sm font-mono text-black font-semibold focus:ring-2 focus:ring-green-500 outline-none"
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>

@@ -19,6 +19,7 @@ create table public.credit_cards (
   statement_balance numeric default 0,
   minimum_payment numeric default 0,
   status text default 'Active',
+  is_shared_limit boolean default false,
   created_at timestamptz default now()
 );
 

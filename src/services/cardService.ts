@@ -21,6 +21,7 @@ const mapCardFromDB = (dbCard: any, transactions: any[] = [], installments: any[
     statementBalance: Number(dbCard.statement_balance),
     minimumPayment: Number(dbCard.minimum_payment),
     status: dbCard.status,
+    isSharedLimit: dbCard.is_shared_limit,
     history: transactions.map(mapTransactionFromDB),
     installments: installments.map(mapInstallmentFromDB)
 });
@@ -127,7 +128,8 @@ export const addCard = async (card: Omit<CreditCard, 'id'>): Promise<CreditCard>
             current_balance: card.currentBalance,
             statement_balance: card.statementBalance,
             minimum_payment: card.minimumPayment,
-            status: card.status
+            status: card.status,
+            is_shared_limit: card.isSharedLimit
         })
         .select()
         .single();
@@ -198,6 +200,7 @@ export const updateCard = async (id: string, updates: Partial<CreditCard>): Prom
         if (primitiveUpdates.statementBalance !== undefined) dbUpdates.statement_balance = primitiveUpdates.statementBalance;
         if (primitiveUpdates.minimumPayment !== undefined) dbUpdates.minimum_payment = primitiveUpdates.minimumPayment;
         if (primitiveUpdates.paymentWindowDays !== undefined) dbUpdates.payment_window_days = primitiveUpdates.paymentWindowDays;
+        if (primitiveUpdates.isSharedLimit !== undefined) dbUpdates.is_shared_limit = primitiveUpdates.isSharedLimit;
 
         await supabase.from('credit_cards').update(dbUpdates).eq('id', id);
     }
