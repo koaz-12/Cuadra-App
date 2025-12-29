@@ -1,37 +1,19 @@
 import React, { useState } from 'react';
 import { useBudgets } from '@/hooks/useBudgets';
 import { BudgetCategoryCard } from '@/components/molecules/BudgetCategoryCard';
-import { Plus, LayoutGrid } from 'lucide-react';
+import { AddExpenseModal } from '@/components/organisms/modals/AddExpenseModal';
+import { Plus } from 'lucide-react';
 import { formatCurrency } from '@/utils/format';
 
 export const BudgetWidget = () => {
     const { categories, loading, addExpense, removeCategory, addCategory } = useBudgets();
     const [showAddExpense, setShowAddExpense] = useState<string | null>(null); // CategoryID
-    const [expenseAmount, setExpenseAmount] = useState('');
-    const [expenseDesc, setExpenseDesc] = useState('');
 
     // Category Creation State
     const [showCreateCat, setShowCreateCat] = useState(false);
     const [newCatName, setNewCatName] = useState('');
     const [newCatLimit, setNewCatLimit] = useState('');
     const [newCatIcon, setNewCatIcon] = useState('🛒');
-
-    const handleAddExpense = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!showAddExpense || !expenseAmount) return;
-
-        await addExpense({
-            categoryId: showAddExpense,
-            amount: Number(expenseAmount),
-            date: new Date(),
-            description: expenseDesc || 'Gasto rápido'
-        });
-
-        // Reset
-        setShowAddExpense(null);
-        setExpenseAmount('');
-        setExpenseDesc('');
-    };
 
     const handleCreateCategory = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -97,42 +79,13 @@ export const BudgetWidget = () => {
             </div>
 
             {/* Modal: Add Expense */}
-            {showAddExpense && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl scale-100 animate-in zoom-in-95">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-bold text-slate-900">Registrar Gasto</h3>
-                            <button onClick={() => setShowAddExpense(null)} className="text-slate-400 hover:text-slate-600">✕</button>
-                        </div>
-                        <form onSubmit={handleAddExpense} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 mb-1">Monto (DOP)</label>
-                                <input
-                                    autoFocus
-                                    type="number"
-                                    value={expenseAmount}
-                                    onChange={e => setExpenseAmount(e.target.value)}
-                                    className="w-full text-3xl font-black text-slate-900 border-b-2 border-slate-200 focus:border-emerald-500 outline-none py-2 placeholder:text-slate-200"
-                                    placeholder="0.00"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-slate-500 mb-1">Concepto (Opcional)</label>
-                                <input
-                                    type="text"
-                                    value={expenseDesc}
-                                    onChange={e => setExpenseDesc(e.target.value)}
-                                    className="w-full p-3 bg-slate-50 rounded-xl border border-slate-200 outline-none text-sm font-medium"
-                                    placeholder="Ej: Compra semanal"
-                                />
-                            </div>
-                            <button className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-200">
-                                Guardar Gasto
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
+            <AddExpenseModal
+                isOpen={!!showAddExpense}
+                onClose={() => setShowAddExpense(null)}
+                categories={categories}
+                initialCategoryId={showAddExpense}
+                onAddExpense={addExpense}
+            />
 
             {/* Modal: Create Category */}
             {showCreateCat && (

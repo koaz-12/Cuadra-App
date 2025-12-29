@@ -7,17 +7,19 @@ import { useBudgets } from '@/hooks/useBudgets';
 import { FixedExpenseRow } from '@/components/molecules/FixedExpenseRow';
 import { BudgetWidget } from '@/components/organisms/BudgetWidget';
 import { VariableExpensesList } from '@/components/organisms/VariableExpensesList';
-import { Plus, TrendingUp, CheckCircle2, Clock, CalendarRange, ArrowRight, List, LayoutGrid } from 'lucide-react';
+import { AddExpenseModal } from '@/components/organisms/modals/AddExpenseModal';
+import { Plus, TrendingUp, CheckCircle2, Clock, CalendarRange, ArrowRight, List, LayoutGrid, Banknote } from 'lucide-react';
 import { formatCurrency } from '@/utils/format';
 
 export default function ExpensesPage() {
     const [activeTab, setActiveTab] = useState<'movements' | 'budget'>('movements');
+    const [isAddingExpense, setIsAddingExpense] = useState(false);
 
     // Fixed Expenses Logic
     const { expenses, loading: expensesLoading, togglePaid, removeExpense } = useFixedExpenses();
 
     // Variable Expenses Logic
-    const { recentExpenses, categories, loading: budgetLoading } = useBudgets();
+    const { recentExpenses, categories, addExpense, loading: budgetLoading } = useBudgets();
 
     const [financialStartDay, setFinancialStartDay] = React.useState(1);
 
@@ -162,10 +164,11 @@ export default function ExpensesPage() {
                                 <p className="text-sm text-slate-500">Tus consumos diarios registrados en presupuesto.</p>
                             </div>
                             <button
-                                onClick={() => setActiveTab('budget')}
-                                className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                                onClick={() => setIsAddingExpense(true)}
+                                className="bg-slate-900 text-white hover:bg-slate-800 transition-colors px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-slate-200 active:scale-95"
                             >
-                                Registrar Gasto <ArrowRight size={16} />
+                                <Banknote size={18} />
+                                Registrar Gasto
                             </button>
                         </div>
 
@@ -185,6 +188,13 @@ export default function ExpensesPage() {
                     <BudgetWidget />
                 </div>
             )}
+
+            <AddExpenseModal
+                isOpen={isAddingExpense}
+                onClose={() => setIsAddingExpense(false)}
+                categories={categories}
+                onAddExpense={addExpense}
+            />
         </div>
     );
 }
