@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BudgetCategory, VariableExpense } from '@/types/finance';
 import { getBudgetCategories, addBudgetCategory, deleteBudgetCategory, addVariableExpense, getVariableExpenses } from '@/services/budgetService';
+import { getFinancialMonthStartDate } from '@/utils/date';
 
 interface UseBudgetsReturn {
     categories: BudgetCategory[];
@@ -21,9 +22,14 @@ export const useBudgets = (): UseBudgetsReturn => {
     const loadData = useCallback(async () => {
         setLoading(true);
         try {
+            // Get Financial Start Day Logic
+            const savedDay = typeof window !== 'undefined' ? localStorage.getItem('financialStartDay') : '1';
+            const startDay = savedDay ? parseInt(savedDay) : 1;
+            const startDate = getFinancialMonthStartDate(startDay);
+
             const [cats, expenses] = await Promise.all([
-                getBudgetCategories(),
-                getVariableExpenses() // Fetches all/recent
+                getBudgetCategories(startDate), // Pass the calculated start date
+                getVariableExpenses() // Still fetch all recent history for the list
             ]);
             setCategories(cats);
             setRecentExpenses(expenses);

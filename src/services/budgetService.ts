@@ -3,7 +3,7 @@ import { BudgetCategory, VariableExpense } from '@/types/finance';
 
 // --- Budget Categories ---
 
-export const getBudgetCategories = async (): Promise<BudgetCategory[]> => {
+export const getBudgetCategories = async (startDate?: Date): Promise<BudgetCategory[]> => {
     const { data: categories, error } = await supabase
         .from('budget_categories')
         .select('*')
@@ -14,15 +14,18 @@ export const getBudgetCategories = async (): Promise<BudgetCategory[]> => {
         return [];
     }
 
-    // Also fetch current month expenses to calculate 'spent'
-    const startOfMonth = new Date();
-    startOfMonth.setDate(1);
-    startOfMonth.setHours(0, 0, 0, 0);
+    // Default to 1st of current month if no date provided
+    let filterDate = startDate;
+    if (!filterDate) {
+        filterDate = new Date();
+        filterDate.setDate(1);
+        filterDate.setHours(0, 0, 0, 0);
+    }
 
     const { data: expenses } = await supabase
         .from('variable_expenses')
         .select('category_id, amount')
-        .gte('date', startOfMonth.toISOString());
+        .gte('date', filterDate.toISOString());
 
     return categories.map((cat: any) => {
         const catExpenses = expenses?.filter((e: any) => e.category_id === cat.id) || [];
