@@ -39,6 +39,26 @@ export interface CreditCard {
   installments?: Installment[];
 }
 
+export interface BudgetCategory {
+  id: string;
+  userId: string;
+  name: string;
+  monthlyLimit: number; // Presupuesto mensual
+  icon?: string; // Emoji
+  color?: string; // Tailwind class or Hex
+  sortOrder?: number;
+  spent?: number; // Calculated field (total expenses this month)
+}
+
+export interface VariableExpense {
+  id: string;
+  userId: string;
+  categoryId: string;
+  amount: number;
+  date: string | Date;
+  description?: string;
+}
+
 export interface Loan {
   id: string;
   bankName: string;

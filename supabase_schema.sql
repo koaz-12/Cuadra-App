@@ -91,3 +91,33 @@ create policy "Users can translate their own loans" on public.loans for all usin
 create policy "Users can translate their own expenses" on public.fixed_expenses for all using (auth.uid() = user_id);
 create policy "Users can translate their own transactions" on public.transactions for all using (auth.uid() = user_id);
 create policy "Users can translate their own installments" on public.installments for all using (auth.uid() = user_id);
+
+-- 6. Budget Categories (Variable Expenses Groups)
+create table public.budget_categories (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users not null,
+  name text not null,
+  monthly_limit numeric not null,
+  icon text, -- Emoji or Lucide icon name
+  color text, -- CSS color class or hex
+  sort_order integer default 0,
+  created_at timestamptz default now()
+);
+
+-- 7. Variable Expenses (Daily spending)
+create table public.variable_expenses (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users not null,
+  category_id uuid references public.budget_categories(id) on delete set null,
+  amount numeric not null,
+  date timestamptz not null default now(),
+  description text,
+  created_at timestamptz default now()
+);
+
+-- RLS
+alter table public.budget_categories enable row level security;
+alter table public.variable_expenses enable row level security;
+
+create policy "Users can translate their own categories" on public.budget_categories for all using (auth.uid() = user_id);
+create policy "Users can translate their own variable expenses" on public.variable_expenses for all using (auth.uid() = user_id);

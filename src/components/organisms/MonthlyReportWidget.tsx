@@ -4,7 +4,7 @@ import { formatCurrency, formatDate } from '@/utils/format';
 import { ChevronLeft, ChevronRight, Download, FileText, CreditCard as CardIcon, DollarSign, Calendar, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
 import { generateCSV } from '@/utils/export';
-import { getBudget } from '@/services/budgetService';
+import { getBudgetCategories } from '@/services/budgetService';
 
 interface Props {
     cards: CreditCard[];
@@ -25,10 +25,11 @@ export const MonthlyReportWidget = ({ cards, loans, expenses, financialStartDay 
     const [viewDate, setViewDate] = useState(new Date());
     const [budget, setBudget] = useState<number>(0);
 
-    // Fetch Budget on mount
+    // Fetch Budget on mount (Sum of Categories)
     React.useEffect(() => {
-        getBudget().then(b => {
-            if (b) setBudget(b.amount);
+        getBudgetCategories().then(cats => {
+            const total = cats.reduce((sum, c) => sum + c.monthlyLimit, 0);
+            setBudget(total);
         });
     }, []);
 
